@@ -141,6 +141,13 @@ namespace SportsLeague.DataAccess.Context
                 entity.HasIndex(tt => new { tt.TournamentId, tt.TeamId })
                 .IsUnique();
 
+                //Sponsor
+                modelBuilder.Entity<Sponsor>()
+                .HasIndex(s => s.Name)
+                .IsUnique();
+
+
+                // TournamentSponsor
                 modelBuilder.Entity<TournamentSponsor>(entity =>
                 {
                     entity.HasOne(ts => ts.Tournament)
