@@ -9,4 +9,8 @@ public interface ISponsorService
     Task<Sponsor> CreateAsync(Sponsor sponsor);
     Task UpdateAsync(int id, Sponsor sponsor);
     Task DeleteAsync(int id);
+    Task<List<TournamentSponsor>> GetTournamentsBySponsorIdAsync(int sponsorId);
+    Task<TournamentSponsor> AddSponsorToTournamentAsync(int sponsorId, int tournamentId, decimal contractAmount);
+    Task RemoveSponsorFromTournamentAsync(int sponsorId, int tournamentId);
+
 }

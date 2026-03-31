@@ -49,8 +49,6 @@ namespace SportsLeague.API.Mappings
                 .ForMember(dest => dest.SponsorName,
                     opt => opt.MapFrom(src => src.Sponsor.Name));
 
-            CreateMap<TournamentSponsorRequestDTO, TournamentSponsor>();
-
         }
 
     }

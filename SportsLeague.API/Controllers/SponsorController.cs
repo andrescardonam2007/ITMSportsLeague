@@ -91,4 +91,27 @@ public class SponsorController : ControllerBase
             return NotFound(new { message = ex.Message }); // 404
         }
     }
+
+    [HttpGet("{id}/tournaments")]
+    public async Task<IActionResult> GetTournaments(int id)
+    {
+        var data = await _sponsorService.GetTournamentsBySponsorIdAsync(id);
+        return Ok(data);
+    }
+
+    [HttpPost("{id}/tournaments")]
+    public async Task<IActionResult> AddToTournament(int id, [FromBody] TournamentSponsorRequestDTO request)
+    {
+        var result = await _sponsorService.AddSponsorToTournamentAsync(id, request.TournamentId, request.ContractAmount);
+        return Created("", result);
+    }
+
+    [HttpDelete("{id}/tournaments/{tid}")]
+    public async Task<IActionResult> RemoveFromTournament(int id, int tid)
+    {
+        await _sponsorService.RemoveSponsorFromTournamentAsync(id, tid);
+        return NoContent();
+    }
+
+
 }

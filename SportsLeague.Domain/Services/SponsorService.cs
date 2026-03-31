@@ -1,8 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using SportsLeague.Domain.Entities;
 using SportsLeague.Domain.Interfaces.Repositories;
 using SportsLeague.Domain.Interfaces.Services;
+
 
 namespace SportsLeague.Domain.Services
 {
@@ -10,12 +12,18 @@ namespace SportsLeague.Domain.Services
     {
         private readonly ISponsorRepository _sponsorRepository;
         private readonly ILogger<SponsorService> _logger;
+        private readonly ITournamentRepository _tournamentRepository;
+        private readonly ITournamentSponsorRepository _tournamentSponsorRepository;
 
         public SponsorService(
-            ISponsorRepository sponsorRepository,
-            ILogger<SponsorService> logger)
+        ISponsorRepository sponsorRepository,
+        ITournamentRepository tournamentRepository,
+        ITournamentSponsorRepository tournamentSponsorRepository,
+        ILogger<SponsorService> logger)
         {
             _sponsorRepository = sponsorRepository;
+            _tournamentRepository = tournamentRepository;
+            _tournamentSponsorRepository = tournamentSponsorRepository;
             _logger = logger;
         }
 
@@ -110,6 +118,48 @@ namespace SportsLeague.Domain.Services
             _logger.LogInformation("Deleting sponsor with ID: {SponsorId}", id);
 
             await _sponsorRepository.DeleteAsync(id);
+        }
+
+        public async Task<List<TournamentSponsor>> GetTournamentsBySponsorIdAsync(int sponsorId)
+        {
+            _logger.LogInformation("Retrieving tournaments for sponsor ID: {SponsorId}", sponsorId);
+
+            var sponsor = await _sponsorRepository.GetByIdAsync(sponsorId);
+            if (sponsor == null)
+            {
+                _logger.LogWarning("Sponsor with ID {SponsorId} not found", sponsorId);
+                throw new KeyNotFoundException($"No se encontró el sponsor con ID {sponsorId}");
+            }
+
+            return sponsor.TournamentSponsors?.ToList() ?? new List<TournamentSponsor>();
+        }
+
+        public async Task<TournamentSponsor> AddSponsorToTournamentAsync(int sponsorId, int tournamentId, decimal contractAmount)
+        {
+            _logger.LogInformation("Adding sponsor {SponsorId} to tournament {TournamentId} with amount {Amount}", sponsorId, tournamentId, contractAmount);
+
+            var sponsor = await _sponsorRepository.GetByIdAsync(sponsorId);
+            if (sponsor == null) throw new KeyNotFoundException($"No se encontró el sponsor con ID {sponsorId}");
+
+            var tournament = await _tournamentRepository.GetByIdAsync(tournamentId);
+            if (tournament == null) throw new KeyNotFoundException($"No se encontró el torneo con ID {tournamentId}");
+
+            // Persistencia de la relación no implementada aquí porque depende de cómo modeles/persistas TournamentSponsor.
+            throw new NotImplementedException("Implementar la creación y persistencia de la relación TournamentSponsor (necesitas un repo o método para guardarla).");
+        }
+
+        public async Task RemoveSponsorFromTournamentAsync(int sponsorId, int tournamentId)
+        {
+            _logger.LogInformation("Removing sponsor {SponsorId} from tournament {TournamentId}", sponsorId, tournamentId);
+
+            var sponsor = await _sponsorRepository.GetByIdAsync(sponsorId);
+            if (sponsor == null) throw new KeyNotFoundException($"No se encontró el sponsor con ID {sponsorId}");
+
+            var tournament = await _tournamentRepository.GetByIdAsync(tournamentId);
+            if (tournament == null) throw new KeyNotFoundException($"No se encontró el torneo con ID {tournamentId}");
+
+            // Remoción no implementada aquí por la misma razón.
+            throw new NotImplementedException("Implementar la eliminación de la relación TournamentSponsor (necesitas un repo o método para borrarla).");
         }
     }
 }

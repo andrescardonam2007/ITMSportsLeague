@@ -1,14 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using SportsLeague.Domain.Entities;
-using SportsLeague.Domain.Interfaces.Repositories;
+﻿using SportsLeague.Domain.Entities;
 
 namespace SportsLeague.Domain.Interfaces.Repositories
 {
-    public interface ITournamentSponsorRepository : IGenericRepository<TournamentSponsor>
+    public interface ITournamentSponsorRepository
     {
-        Task<IEnumerable<TournamentSponsor>> GetByTournamentIdAsync(int tournamentId);
-        Task<IEnumerable<TournamentSponsor>> GetBySponsorIdAsync(int sponsorId);
-        Task<bool> ExistsAsync(int tournamentId, int sponsorId);
+        Task<List<TournamentSponsor>> GetBySponsorIdAsync(int sponsorId);
+        Task<bool> ExistsAsync(int sponsorId, int tournamentId);
+        Task AddAsync(TournamentSponsor entity);
+        Task<TournamentSponsor?> GetAsync(int sponsorId, int tournamentId);
+        Task DeleteAsync(TournamentSponsor entity);
     }
 }
