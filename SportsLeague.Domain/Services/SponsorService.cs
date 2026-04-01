@@ -144,8 +144,23 @@ namespace SportsLeague.Domain.Services
             var tournament = await _tournamentRepository.GetByIdAsync(tournamentId);
             if (tournament == null) throw new KeyNotFoundException($"No se encontró el torneo con ID {tournamentId}");
 
-            // Persistencia de la relación no implementada aquí porque depende de cómo modeles/persistas TournamentSponsor.
-            throw new NotImplementedException("Implementar la creación y persistencia de la relación TournamentSponsor (necesitas un repo o método para guardarla).");
+            if (contractAmount <= 0) throw new InvalidOperationException("El monto del contrato debe ser mayor que 0");
+
+            if (await _tournamentSponsorRepository.ExistsAsync(sponsorId, tournamentId))
+                throw new InvalidOperationException("El sponsor ya está asociado al torneo");
+
+            var relation = new TournamentSponsor
+            {
+                SponsorId = sponsorId,
+                TournamentId = tournamentId,
+                ContractAmount = contractAmount,
+                JoinedAt = DateTime.UtcNow,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            await _tournamentSponsorRepository.AddAsync(relation);
+
+            return relation;
         }
 
         public async Task RemoveSponsorFromTournamentAsync(int sponsorId, int tournamentId)
@@ -158,8 +173,10 @@ namespace SportsLeague.Domain.Services
             var tournament = await _tournamentRepository.GetByIdAsync(tournamentId);
             if (tournament == null) throw new KeyNotFoundException($"No se encontró el torneo con ID {tournamentId}");
 
-            // Remoción no implementada aquí por la misma razón.
-            throw new NotImplementedException("Implementar la eliminación de la relación TournamentSponsor (necesitas un repo o método para borrarla).");
+            var existing = await _tournamentSponsorRepository.GetAsync(sponsorId, tournamentId);
+            if (existing == null) throw new KeyNotFoundException("La relación sponsor-torneo no existe");
+
+            await _tournamentSponsorRepository.DeleteAsync(existing);
         }
     }
 }

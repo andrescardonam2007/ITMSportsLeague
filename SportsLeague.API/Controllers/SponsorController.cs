@@ -102,8 +102,15 @@ public class SponsorController : ControllerBase
     [HttpPost("{id}/tournaments")]
     public async Task<IActionResult> AddToTournament(int id, [FromBody] TournamentSponsorRequestDTO request)
     {
-        var result = await _sponsorService.AddSponsorToTournamentAsync(id, request.TournamentId, request.ContractAmount);
-        return Created("", result);
+        var result = await _sponsorService.AddSponsorToTournamentAsync(
+            id,
+            request.TournamentId,
+            request.ContractAmount
+        );
+
+        var response = _mapper.Map<TournamentSponsorResponseDTO>(result);
+
+        return Created("", response);
     }
 
     [HttpDelete("{id}/tournaments/{tid}")]
