@@ -16,19 +16,11 @@ namespace SportsLeague.DataAccess.Repositories
 
         public async Task<List<TournamentSponsor>> GetBySponsorIdAsync(int sponsorId)
         {
-            var data = await _context.TournamentSponsors
+            return await _context.TournamentSponsors
                 .Include(ts => ts.Tournament)
                 .Include(ts => ts.Sponsor)
+                .Where(ts => ts.SponsorId == sponsorId) // 🔥 AGREGA ESTO
                 .ToListAsync();
-
-            Console.WriteLine($"TOTAL: {data.Count}");
-
-            foreach (var item in data)
-            {
-                Console.WriteLine($"SponsorId: {item.SponsorId} - TournamentId: {item.TournamentId}");
-            }
-
-            return data; // 👈 SIN FILTRO
         }
 
         public async Task<bool> ExistsAsync(int sponsorId, int tournamentId)

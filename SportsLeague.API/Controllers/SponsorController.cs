@@ -54,7 +54,7 @@ public class SponsorController : ControllerBase
         }
         catch (InvalidOperationException ex)
         {
-            return Conflict(new { message = ex.Message }); // 409
+            return Conflict(new { message = ex.Message });
         }
     }
 
@@ -70,11 +70,11 @@ public class SponsorController : ControllerBase
         }
         catch (KeyNotFoundException ex)
         {
-            return NotFound(new { message = ex.Message }); // 404
+            return NotFound(new { message = ex.Message });
         }
         catch (InvalidOperationException ex)
         {
-            return Conflict(new { message = ex.Message }); // 409
+            return Conflict(new { message = ex.Message });
         }
     }
 
@@ -88,37 +88,55 @@ public class SponsorController : ControllerBase
         }
         catch (KeyNotFoundException ex)
         {
-            return NotFound(new { message = ex.Message }); // 404
+            return NotFound(new { message = ex.Message });
         }
     }
 
-    [HttpGet("{id}/tournaments")]
-    public async Task<IActionResult> GetTournaments(int id)
+    // 🔥 GET tournaments por sponsor (ARREGLADO)
+    [HttpGet("{sponsorId}/tournaments")]
+    public async Task<ActionResult<IEnumerable<TournamentSponsorResponseDTO>>> GetTournaments(int sponsorId)
     {
-        var data = await _sponsorService.GetTournamentsBySponsorIdAsync(id);
-        return Ok(data);
+        var data = await _sponsorService.GetTournamentsBySponsorIdAsync(sponsorId);
+
+        var response = _mapper.Map<IEnumerable<TournamentSponsorResponseDTO>>(data);
+
+        return Ok(response);
     }
 
-    [HttpPost("{id}/tournaments")]
-    public async Task<IActionResult> AddToTournament(int id, [FromBody] TournamentSponsorRequestDTO request)
+    // 🔥 POST relación sponsor-torneo
+    [HttpPost("{sponsorId}/tournaments")]
+    public async Task<IActionResult> AddToTournament(int sponsorId, [FromBody] TournamentSponsorRequestDTO request)
     {
-        var result = await _sponsorService.AddSponsorToTournamentAsync(
-            id,
-            request.TournamentId,
-            request.ContractAmount
-        );
+        try
+        {
+            var result = await _sponsorService.AddSponsorToTournamentAsync(
+                sponsorId,
+                request.TournamentId,
+                request.ContractAmount
+            );
 
-        var response = _mapper.Map<TournamentSponsorResponseDTO>(result);
+            var response = _mapper.Map<TournamentSponsorResponseDTO>(result);
 
-        return Created("", response);
+            return Created("", response);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
-    [HttpDelete("{id}/tournaments/{tid}")]
-    public async Task<IActionResult> RemoveFromTournament(int id, int tid)
+    // 🔥 DELETE relación sponsor-torneo
+    [HttpDelete("{sponsorId}/tournaments/{tournamentId}")]
+    public async Task<IActionResult> RemoveFromTournament(int sponsorId, int tournamentId)
     {
-        await _sponsorService.RemoveSponsorFromTournamentAsync(id, tid);
-        return NoContent();
+        try
+        {
+            await _sponsorService.RemoveSponsorFromTournamentAsync(sponsorId, tournamentId);
+            return NoContent();
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
     }
-
-
 }
