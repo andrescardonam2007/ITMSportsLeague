@@ -92,7 +92,6 @@ public class SponsorController : ControllerBase
         }
     }
 
-    // 🔥 GET tournaments por sponsor (ARREGLADO)
     [HttpGet("{sponsorId}/tournaments")]
     public async Task<ActionResult<IEnumerable<TournamentSponsorResponseDTO>>> GetTournaments(int sponsorId)
     {
@@ -103,7 +102,6 @@ public class SponsorController : ControllerBase
         return Ok(response);
     }
 
-    // 🔥 POST relación sponsor-torneo
     [HttpPost("{sponsorId}/tournaments")]
     public async Task<IActionResult> AddToTournament(int sponsorId, [FromBody] TournamentSponsorRequestDTO request)
     {
@@ -119,13 +117,16 @@ public class SponsorController : ControllerBase
 
             return Created("", response);
         }
-        catch (Exception ex)
+        catch (InvalidOperationException ex)
         {
-            return BadRequest(new { message = ex.Message });
+            return Conflict(new { message = ex.Message });
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message }); 
         }
     }
 
-    // 🔥 DELETE relación sponsor-torneo
     [HttpDelete("{sponsorId}/tournaments/{tournamentId}")]
     public async Task<IActionResult> RemoveFromTournament(int sponsorId, int tournamentId)
     {
