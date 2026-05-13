@@ -42,7 +42,7 @@ public class MatchLineupController : ControllerBase
             var createdLineup = lineupByMatch
                 .FirstOrDefault(l => l.Id == created.Id);
 
-            return Ok(_mapper.Map<MatchLineupResponseDTO>(createdLineup));
+            return StatusCode(201, _mapper.Map<MatchLineupResponseDTO>(createdLineup));
         }
         catch (KeyNotFoundException ex)
         {
