@@ -4,6 +4,7 @@ using SportsLeague.API.DTOs.Request;
 using SportsLeague.API.DTOs.Response;
 using SportsLeague.Domain.Entities;
 using SportsLeague.Domain.Interfaces.Services;
+
 namespace SportsLeague.API.Controllers;
 
 [ApiController]
